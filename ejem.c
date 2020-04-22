@@ -14,7 +14,7 @@ struct s_dir{
   int tipo;
   char *nombre;
 }res[128];
-
+ 
 int leer (char *cwd)
 {
   DIR *dir = opendir (cwd);
@@ -42,7 +42,7 @@ char *hazLinea (char *base, int dir)
       b=base[dir+4*i+1];
       c=base[dir+4*i+2];
       d= base[dir+4*i+3];
-      o+=sprintf(&linea[o],"%02x %02x %02x %02x|",a,b,c,d);
+      o+=sprintf(&linea[o],"%02x %02x %02x %02x|",a,b,c,d); 
     }
   for (int i=0; i<16;i++)
     {
@@ -83,34 +83,32 @@ void archivo (char *name)
       perror("Error mapeando el archivo");
       exit (EXIT_FAILURE);
     }
-  for (int i =0; i<25; i++)
-    {
-      //Haz linea, base y offset
-      char *l = hazLinea(map,i*16);
-      mvprintw(i,0,l);
-    }
-  refresh();
 
   int ch,a;
   int c=0,r=0;
   int x=0,y=0;
-  move(c,9+r);
-
   do
     {
+      for (int i=0;i<25;i++)
+	{
+	  char *l = hazLinea(map,i*16);
+	  mvprintw(i,0,l);
+	}
+      move (c,9+r);
+      refresh();
       ch = getch();
       switch(ch)
 	{
-	case 'A':
+	case 'D':
 	  r = (r>0) ? r-1 : 24;
 	  break;
-	case 'B':
+	case 'C':
 	  r = (r<24) ? r + 1 : 0;
 	  break;
-	case 'C':
+	case 'B':
 	  c = (c<31) ? c+1 : 0;
 	  break;
-	case 'D':
+	case 'A':
 	  c = (c>0) ? c-1 : 31;
 	  break;
 	}
