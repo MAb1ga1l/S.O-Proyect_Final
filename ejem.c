@@ -14,7 +14,7 @@ struct s_dir{
   int tipo;
   char *nombre;
 }res[128];
- 
+
 int leer (char *cwd)
 {
   DIR *dir = opendir (cwd);
@@ -42,7 +42,7 @@ char *hazLinea (char *base, int dir)
       b=base[dir+4*i+1];
       c=base[dir+4*i+2];
       d= base[dir+4*i+3];
-      o+=sprintf(&linea[o],"%02x %02x %02x %02x|",a,b,c,d); 
+      o+=sprintf(&linea[o],"%02x %02x %02x %02x|",a,b,c,d);
     }
   for (int i=0; i<16;i++)
     {
@@ -89,6 +89,36 @@ void archivo (char *name)
       char *l = hazLinea(map,i*16);
       mvprintw(i,0,l);
     }
+  refresh();
+
+  int ch,a;
+  int c=0,r=0;
+  int x=0,y=0;
+  move(c,9+r);
+
+  do
+    {
+      ch = getch();
+      switch(ch)
+	{
+	case 'A':
+	  r = (r>0) ? r-1 : 24;
+	  break;
+	case 'B':
+	  r = (r<24) ? r + 1 : 0;
+	  break;
+	case 'C':
+	  c = (c<31) ? c+1 : 0;
+	  break;
+	case 'D':
+	  c = (c>0) ? c-1 : 31;
+	  break;
+	}
+      y = r;
+      x = (c<16) ? c*3+9 : 41+c;
+    }while (ch!=24);
+  endwin ();
+  clear ();
 }
 
 int main ()
@@ -131,6 +161,7 @@ int main ()
 	      //si es archivo salte
 	      if (res[i].tipo == DT_REG)
 		{
+		  clear ();
 		  archivo (res[i].nombre);
 		}
 	    }
@@ -162,7 +193,7 @@ int main ()
 	}
       move (1,1);
       printw("Estoy en %d: Lei %d",i,c);
-    }while (c!='q');
+    }while (c!=24);
   endwin();
   return 0;
 }
