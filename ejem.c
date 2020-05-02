@@ -99,17 +99,17 @@ void archivo (char *name)
       ch = getch();
       switch(ch)
 	{
-	case 'D':
-	  r = (r>0) ? r-1 : 24;
+	case 'D': //Flechas de izquierda
+	  r = (r>0) ? r-3 : 45; 
 	  break;
-	case 'C':
-	  r = (r<24) ? r + 1 : 0;
+	case 'C': //Flecha de derecha
+	  r = (r<45) ? r + 3 : 0;
 	  break;
-	case 'B':
-	  c = (c<31) ? c+1 : 0;
+	case 'B': //Flecha de abajo
+	  c = (c<24) ? c+1 : 0; 
 	  break;
-	case 'A':
-	  c = (c>0) ? c-1 : 31;
+	case 'A': //Flecha de arriba
+	  c = (c>0) ? c-1 : 24;
 	  break;
 	}
       y = r;
