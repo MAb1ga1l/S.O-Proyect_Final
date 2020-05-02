@@ -100,10 +100,28 @@ void archivo (char *name)
       switch(ch)
 	{
 	case 'D': //Flechas de izquierda
-	  r = (r>0) ? r-3 : 45; 
+	  //r = (r>0) ? r-3 : 45; 
+    if (r>0 && r<48) {
+      r= r-3;
+    }else{
+      if (r>48 && r<63){
+        r = r-1;
+      }else{
+        r = 63;
+      }
+    }
 	  break;
 	case 'C': //Flecha de derecha
-	  r = (r<45) ? r + 3 : 0;
+	  //r = (r<45) ? r + 3 : 0;
+    if (r<63) {
+      if (r<48){
+        r = r+3;
+      }else{
+        r= r+1;
+      }
+    }else{
+      r = 0;
+    }
 	  break;
 	case 'B': //Flecha de abajo
 	  c = (c<24) ? c+1 : 0; 
@@ -111,6 +129,12 @@ void archivo (char *name)
 	case 'A': //Flecha de arriba
 	  c = (c>0) ? c-1 : 24;
 	  break;
+  /*case 'E': //Para navegar por el texto espacio
+	  r = (r>47) ? r-1 : 50;
+	  break;
+  case '8': //Para navegar por el texto shift
+	  r = (r<47) ? r + 1 : 47;
+	  break;*/
 	}
       y = r;
       x = (c<16) ? c*3+9 : 41+c;
