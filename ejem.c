@@ -59,89 +59,118 @@ char *hazLinea (char *base, int dir)
   return(strdup(linea));
 }
 
+int leeChar() {
+  int chars[5];
+  int ch,i=0;
+  nodelay(stdscr, TRUE);
+  while((ch = getch()) == ERR); /* Espera activa */
+  ungetch(ch);
+  while((ch = getch()) != ERR) {
+    chars[i++]=ch;
+  }
+  /* convierte a numero con todo lo leido */
+  int res=0;
+  for(int j=0;j<i;j++) {
+    res <<=8;
+    res |= chars[j];
+  }
+  return res;
+}
+
+/*int main(void) {
+  int fd = open("test_file", O_RDWR | O_CREAT, (mode_t)0600);
+  const char *text = "hello";
+  size_t textsize = strlen(text) + 1;
+  lseek(fd, textsize-1, SEEK_SET);
+  write(fd, "", 1);
+  char *map = mmap(0, textsize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  memcpy(map, text, strlen(text));
+  msync(map, textsize, MS_SYNC);
+  munmap(map, textsize);
+  close(fd);
+  return 0;
+}*/
+
 void archivo (char *name)
 {
   initscr();
   raw ();
   noecho ();
-  int fd = open(name,O_RDONLY);
-  if (fd==-1)
-    {
-      perror ("Error abriendo el archivo");
-      exit (EXIT_FAILURE);
-    }
-
+  int fd = open(name,O_RDWR);
+  if (fd==-1){
+    perror ("Error abriendo el archivo");
+    exit (EXIT_FAILURE);
+  }
   /* Mapea el archivo */
   struct stat st;
   fstat (fd,&st);
   int fs = st.st_size;
 
-  char *map = mmap(0, fs, PROT_READ, MAP_SHARED, fd, 0);
-  if (map == MAP_FAILED)
-    {
-      close (fd);
-      perror("Error mapeando el archivo");
-      exit (EXIT_FAILURE);
-    }
+  char *map = mmap(0, fs, PROT_READ | PROT_WRITE  , MAP_SHARED, fd, 0);
+  if (map == MAP_FAILED){
+    close (fd);
+    perror("Error mapeando el archivo");
+    exit (EXIT_FAILURE);
+  }
 
   int ch,a;
   int c=0,r=0;
   int x=0,y=0;
-  do
-    {
-      for (int i=0;i<25;i++)
-	{
-	  char *l = hazLinea(map,i*16);
-	  mvprintw(i,0,l);
-	}
-      move (c,9+r);
-      refresh();
-      ch = getch();
-      switch(ch)
-	{
-	case 'D': //Flechas de izquierda
-	  //r = (r>0) ? r-3 : 45; 
-    if (r>0 && r<48) {
-      r= r-3;
-    }else{
-      if (r>48 && r<63){
-        r = r-1;
-      }else{
-        r = 63;
-      }
-    }
-	  break;
-	case 'C': //Flecha de derecha
-	  //r = (r<45) ? r + 3 : 0;
-    if (r<63) {
-      if (r<48){
-        r = r+3;
-      }else{
-        r= r+1;
-      }
-    }else{
-      r = 0;
-    }
-	  break;
-	case 'B': //Flecha de abajo
-	  c = (c<24) ? c+1 : 0; 
-	  break;
-	case 'A': //Flecha de arriba
-	  c = (c>0) ? c-1 : 24;
-	  break;
-  /*case 'E': //Para navegar por el texto espacio
-	  r = (r>47) ? r-1 : 50;
-	  break;
-  case '8': //Para navegar por el texto shift
-	  r = (r<47) ? r + 1 : 47;
-	  break;*/
-	}
-      y = r;
-      x = (c<16) ? c*3+9 : 41+c;
-    }while (ch!=24);
+  do{
+    for (int i=0;i<25;i++){
+	    char *l = hazLinea(map,i*16);
+	    mvprintw(i,0,l);
+	  }
+    move (c,9+r);
+    refresh();
+    ch = getch();
+    switch(ch){
+      case 'D': //Flechas de izquierda
+        //r = (r>0) ? r-3 : 45; 
+        if (r>0 && r<48) {
+          r= r-3;
+        }else{
+          if (r>48 && r<63){
+            r = r-1;
+          }else{
+            r = 63;
+          }
+        }
+        break;
+      case 'C': //Flecha de derecha
+        //r = (r<45) ? r + 3 : 0;
+        if (r<63) {
+          if (r<48){
+            r = r+3;
+          }else{
+            r= r+1;
+          }
+        }else{
+          r = 0;
+        }
+        break;
+      case 'B': //Flecha de abajo
+        c = (c<24) ? c+1 : 0; 
+        break;
+      case 'A': //Flecha de arriba
+	      c = (c>0) ? c-1 : 24;
+	    break;
+	  }
+    y = r;
+    x = (c<16) ? c*3+9 : 41+c;
+  }while (ch!=24);
+  if(munmap(map,fs)==-1){
+    perror("Error un-unmapping the file");
+  }
+  /*leeChar();
+  memcpy(map, text, strlen(text));
+  msync(map, textsize, MS_SYNC);
+  munmap(map, textsize);*/
+  close(fd);
   endwin ();
   clear ();
 }
+
 
 int main ()
 {
