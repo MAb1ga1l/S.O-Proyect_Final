@@ -100,7 +100,7 @@ void archivo (char *name)
   }
 
   int ch,a;
-  int c=0,r=0;
+  int c=0,r=0, t=0;
   int x=0,y=0;
   do{
     for (int i=0;i<25;i++){
@@ -146,7 +146,12 @@ void archivo (char *name)
 	      c = (c>0) ? c-1 : 24;
 	    break;
       default://Quiere cambiar el texto
-        map[r]=ch;
+        if(r <48 && r!=0){
+          t = r/3;
+          map[t]=ch;
+        }else{
+          map[r]=ch;
+        }
       break;
 	  }
     y = r;
