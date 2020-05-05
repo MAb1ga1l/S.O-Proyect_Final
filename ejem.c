@@ -146,12 +146,20 @@ void archivo (char *name)
 	      c = (c>0) ? c-1 : 24;
 	    break;
       default://Quiere cambiar el texto
-        if(r <48 && r!=0){
-          t = r/3;
-          map[t]=ch;
+        if(r == 0 && c == 0){
+          map[r] = ch;
         }else{
-          map[r]=ch;
+          if(r <48 && r!=0){
+            t = r/3;
+            map[t+(16*c)]=ch;
+          }else{
+            if(r == 0 && c!= 0){
+              map[r+(16*c)] = ch;
+            }
+          }
         }
+        
+        
       break;
 	  }
     y = r;
