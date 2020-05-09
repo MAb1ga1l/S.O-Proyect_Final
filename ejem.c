@@ -99,8 +99,8 @@ void archivo (char *name)
   fstat (fdl,&st);
   int fs = st.st_size;
   char *mapo = mmap(0 ,  fs , PROT_READ, MAP_SHARED,  fdl ,  0 );
-  char *map = mmap(0, fs + 512, PROT_READ | PROT_WRITE, MAP_SHARED, fde, 0); 
-  memcpy(mapo, map, fs);
+  char *map = mmap(0, fs+512, PROT_READ | PROT_WRITE, MAP_SHARED, fde, 0); 
+  memcpy(map, mapo, fs);
   //char *map = mmap(0, fs, PROT_READ | PROT_WRITE  , MAP_SHARED, fd, 0);
   if (map == MAP_FAILED){
     close (fde);
@@ -182,7 +182,10 @@ void archivo (char *name)
   /*if(munmap(map,fs)==-1){
     perror("Error un-unmapping the file");
   }*/
-  if (munmap(map, fs_REAL) == -1)
+  struct stat st2;
+  fstat (fde,&st2);
+  int fs2 = st.st_size;
+  if (munmap(map, fs2) == -1)
   {
     perror("Error un-mmapping the file");
   }
@@ -196,34 +199,6 @@ void archivo (char *name)
   endwin ();
   clear ();
 }
-
-void insetrar(){
-  int fdl = open(FILEPATH, O_RDONLY);
-  int fde = open(FILEPATH, O_RDWR);
-
-  /* Mapea el archivo de entrada y salida*/
-  char *mapo = mmap(0, fs, PROT_REA, MAP_SHARED, fd, 0);
-  char *map = mmap(0, fs + SLACK, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-
-  memcpy(mapo, map, fs);
-
-  //Pedir cambio y hacerlo
-  
-  if (munmap(map, fs_REAL) == -1)
-  {
-    perror("Error un-mmapping the file");
-  }
-  if (munmap(mapo, fs) == -1)
-  {
-    perror("Error un-mmapping the file");
-  }
-
-  /* Cierra el archivo
-*/
-  close(fde);
-  close(fdl);
-}
-
 
 int main ()
 {
