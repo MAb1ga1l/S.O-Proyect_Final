@@ -171,6 +171,33 @@ void archivo (char *name)
   clear ();
 }
 
+void insetrar(){
+  int fdl = open(FILEPATH, O_RDONLY);
+  int fde = open(FILEPATH, O_RDWR);
+
+  /* Mapea el archivo de entrada y salida*/
+  char *mapo = mmap(0, fs, PROT_REA, MAP_SHARED, fd, 0);
+  char *map = mmap(0, fs + SLACK, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+
+  memcpy(mapo, map, fs);
+
+  //Pedir cambio y hacerlo
+  
+  if (munmap(map, fs_REAL) == -1)
+  {
+    perror("Error un-mmapping the file");
+  }
+  if (munmap(mapo, fs) == -1)
+  {
+    perror("Error un-mmapping the file");
+  }
+
+  /* Cierra el archivo
+*/
+  close(fde);
+  close(fdl);
+}
+
 
 int main ()
 {
@@ -244,6 +271,7 @@ int main ()
 	}
       move (1,1);
       printw("Estoy en %d: Lei %d",i,c);
+      insertar();
     }while (c!=24);
   endwin();
   return 0;
