@@ -82,20 +82,34 @@ void archivo (char *name)
   initscr();
   raw ();
   noecho ();
-  int fd = open(name,O_RDWR);
-  if (fd==-1){
+  int fdl = open(name, O_RDONLY);
+  int fde = open(name, O_RDWR);
+  //int fd = open(name,O_RDWR);
+  if (fdl==-1){
+    perror ("Error abriendo el archivo");
+    exit (EXIT_FAILURE);
+  }
+  if (fde==-1){
     perror ("Error abriendo el archivo");
     exit (EXIT_FAILURE);
   }
   /* Mapea el archivo */
   struct stat st;
-  fstat (fd,&st);
+  //fstat (fd,&st);
+  fstat (fdl,&st);
   int fs = st.st_size;
-
-  char *map = mmap(0, fs, PROT_READ | PROT_WRITE  , MAP_SHARED, fd, 0);
+  char *mapo = mmap(0 ,  fs , PROT_READ, MAP_SHARED,  fdl ,  0 );
+  char *map = mmap(0, fs + 512, PROT_READ | PROT_WRITE, MAP_SHARED, fde, 0); 
+  memcpy(mapo, map, fs);
+  //char *map = mmap(0, fs, PROT_READ | PROT_WRITE  , MAP_SHARED, fd, 0);
   if (map == MAP_FAILED){
-    close (fd);
+    close (fde);
     perror("Error mapeando el archivo");
+    exit (EXIT_FAILURE);
+  }
+  if (mapo == MAP_FAILED){
+    close (fdl);
+    perror("Error mapeando el archivo para editar");
     exit (EXIT_FAILURE);
   }
 
@@ -165,11 +179,20 @@ void archivo (char *name)
     y = r;
     x = (c<16) ? c*3+9 : 41+c;
   }while (ch!=24);
-  if(munmap(map,fs)==-1){
+  /*if(munmap(map,fs)==-1){
     perror("Error un-unmapping the file");
+  }*/
+  if (munmap(map, fs_REAL) == -1)
+  {
+    perror("Error un-mmapping the file");
   }
-  
-  close(fd);
+  if (munmap(mapo, fs) == -1)
+  {
+    perror("Error un-mmapping the file");
+  }
+  close(fde);
+  close(fdl);
+  //close(fd);
   endwin ();
   clear ();
 }
@@ -274,7 +297,7 @@ int main ()
 	}
       move (1,1);
       printw("Estoy en %d: Lei %d",i,c);
-      insertar();
+      //insertar();
     }while (c!=24);
   endwin();
   return 0;
