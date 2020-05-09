@@ -77,20 +77,6 @@ int leeChar() {
   return res;
 }
 
-/*int main(void) {
-  int fd = open("test_file", O_RDWR | O_CREAT, (mode_t)0600);
-  const char *text = "hello";
-  size_t textsize = strlen(text) + 1;
-  lseek(fd, textsize-1, SEEK_SET);
-  write(fd, "", 1);
-  char *map = mmap(0, textsize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  memcpy(map, text, strlen(text));
-  msync(map, textsize, MS_SYNC);
-  munmap(map, textsize);
-  close(fd);
-  return 0;
-}*/
-
 void archivo (char *name)
 {
   initscr();
@@ -114,7 +100,7 @@ void archivo (char *name)
   }
 
   int ch,a;
-  int c=0,r=0;
+  int c=0,r=0, t=0;
   int x=0,y=0;
   do{
     for (int i=0;i<25;i++){
@@ -123,9 +109,10 @@ void archivo (char *name)
 	  }
     move (c,9+r);
     refresh();
-    ch = getch();
+    ch =leeChar();
     switch(ch){
-      case 'D': //Flechas de izquierda
+      //case 'D': //Flechas de izquierda
+      case 0x1B5B44: //Flechas de izquierda
         //r = (r>0) ? r-3 : 45; 
         if (r>0 && r<48) {
           r= r-3;
@@ -137,7 +124,8 @@ void archivo (char *name)
           }
         }
         break;
-      case 'C': //Flecha de derecha
+      //case 'C': //Flecha de derecha
+      case 0x1B5B43:
         //r = (r<45) ? r + 3 : 0;
         if (r<63) {
           if (r<48){
@@ -149,12 +137,30 @@ void archivo (char *name)
           r = 0;
         }
         break;
-      case 'B': //Flecha de abajo
+      //case 'B': //Flecha de abajo
+      case 0x1B5B42:
         c = (c<24) ? c+1 : 0; 
         break;
-      case 'A': //Flecha de arriba
+      //case 'A': //Flecha de arriba
+      case 0x1B5B41: 
 	      c = (c>0) ? c-1 : 24;
 	    break;
+      default://Quiere cambiar el texto
+        if(r == 0 && c == 0){
+          map[r] = ch;
+        }else{
+          if(r <48 && r!=0){
+            t = r/3;
+            map[t+(16*c)]=ch;
+          }else{
+            if(r == 0 && c!= 0){
+              map[r+(16*c)] = ch;
+            }
+          }
+        }
+        
+        
+      break;
 	  }
     y = r;
     x = (c<16) ? c*3+9 : 41+c;
@@ -162,10 +168,7 @@ void archivo (char *name)
   if(munmap(map,fs)==-1){
     perror("Error un-unmapping the file");
   }
-  /*leeChar();
-  memcpy(map, text, strlen(text));
-  msync(map, textsize, MS_SYNC);
-  munmap(map, textsize);*/
+  
   close(fd);
   endwin ();
   clear ();
