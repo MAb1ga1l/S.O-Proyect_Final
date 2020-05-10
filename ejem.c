@@ -83,14 +83,14 @@ void archivo (char *name)
   raw ();
   noecho ();
   int fdl = open(name, O_RDONLY);
-  int fde = open(name, O_RDWR);
+  int fde = open("copiaEditable", O_RDWR|O_CREAT, 00700); 
   //int fd = open(name,O_RDWR);
   if (fdl==-1){
     perror ("Error abriendo el archivo");
     exit (EXIT_FAILURE);
   }
   if (fde==-1){
-    perror ("Error abriendo el archivo");
+    perror ("Error abriendo el archivo nuevo");
     exit (EXIT_FAILURE);
   }
   /* Mapea el archivo */
@@ -98,6 +98,9 @@ void archivo (char *name)
   //fstat (fd,&st);
   fstat (fdl,&st);
   int fs = st.st_size;
+  lseek(fde,fs+512,SEEK_SET);
+  write(fde,&st,1);
+  fsync(fde);
   char *mapo = mmap(0 ,  fs , PROT_READ, MAP_SHARED,  fdl ,  0 );
   char *map = mmap(0, fs+512, PROT_READ | PROT_WRITE, MAP_SHARED, fde, 0); 
   memcpy(map, mapo, fs);
